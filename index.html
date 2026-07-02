@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOL项目组会议纪要对比工具</title>
+<style>
+  :root {
+    --primary: #2563EB;
+    --primary-light: #DBEAFE;
+    --success: #16A34A;
+    --warning: #D97706;
+    --danger: #DC2626;
+    --gray-50: #F9FAFB;
+    --gray-100: #F3F4F6;
+    --gray-200: #E5E7EB;
+    --gray-300: #D1D5DB;
+    --gray-500: #6B7280;
+    --gray-700: #374151;
+    --gray-900: #111827;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans SC", sans-serif;
+    background: var(--gray-50);
+    color: var(--gray-900);
+    line-height: 1.6;
+  }
+  .header {
+    background: linear-gradient(135deg, #1E3A5F 0%, #2563EB 100%);
+    color: #fff;
+    padding: 24px 32px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.15);
+  }
+  .header h1 { font-size: 22px; font-weight: 700; }
+  .header p { font-size: 13px; opacity: .85; margin-top: 4px; }
+
+  .container { max-width: 1400px; margin: 0 auto; padding: 24px 16px; }
+
+  /* Stats bar */
+  .stats-bar {
+    display: flex; gap: 16px; padding: 14px 24px;
+    background: #fff; border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.08);
+    margin-bottom: 20px; flex-wrap: wrap; align-items: center;
+  }
+  .stats-bar .stat { font-size: 13px; color: var(--gray-700); }
+  .stats-bar .stat strong { color: var(--primary); font-size: 18px; }
+
+  /* Timeline bar */
+  .timeline-bar {
+    display: flex; align-items: center; gap: 6px; padding: 16px 24px;
+    background: #fff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.08);
+    margin-bottom: 24px; flex-wrap: wrap; overflow-x: auto;
+  }
+  .timeline-bar .label { font-size: 13px; color: var(--gray-500); font-weight: 600; margin-right: 4px; white-space: nowrap; }
+  .timeline-dot {
+    width: 12px; height: 12px; border-radius: 50%; background: var(--primary);
+    border: 2px solid var(--primary-light); flex-shrink: 0; cursor: default;
+  }
+  .timeline-arrow { color: var(--gray-300); font-size: 16px; }
+
+  /* Comparison Section */
+  .comparison-section {
+    background: #fff; border-radius: 12px; padding: 28px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.08); margin-bottom: 24px;
+  }
+  .comparison-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 20px; flex-wrap: wrap; gap: 12px;
+  }
+  .comparison-header h2 { font-size: 18px; }
+  .nav-tabs { display: flex; gap: 4px; flex-wrap: wrap; }
+  .nav-tab {
+    padding: 8px 14px; border-radius: 8px; border: 1px solid var(--gray-200);
+    background: #fff; font-size: 12px; cursor: pointer; transition: all .2s; white-space: nowrap;
+  }
+  .nav-tab:hover { border-color: var(--primary); color: var(--primary); }
+  .nav-tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+  /* Compare Grid */
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .compare-panel { border: 1px solid var(--gray-200); border-radius: 10px; overflow: hidden; }
+  .panel-header {
+    padding: 14px 18px; font-weight: 700; font-size: 15px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .panel-header .badge { font-size: 12px; font-weight: 600; padding: 2px 10px; border-radius: 10px; }
+  .panel-old .panel-header { background: #FEF3C7; color: #92400E; }
+  .panel-old .badge { background: #FDE68A; color: #78350F; }
+  .panel-new .panel-header { background: #D1FAE5; color: #065F46; }
+  .panel-new .badge { background: #A7F3D0; color: #064E3B; }
+  .panel-body { padding: 18px; font-size: 13.5px; line-height: 1.8; }
+
+  .section-block { margin-bottom: 18px; }
+  .section-block h4 { font-size: 14px; font-weight: 700; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 2px solid var(--gray-100); }
+  .section-block ul, .section-block ol { padding-left: 20px; }
+  .section-block li { margin-bottom: 4px; }
+  .section-block table { width: 100%; border-collapse: collapse; font-size: 12.5px; margin-top: 6px; }
+  .section-block th, .section-block td { border: 1px solid var(--gray-200); padding: 8px 10px; text-align: left; vertical-align: top; }
+  .section-block th { background: var(--gray-50); font-weight: 600; }
+
+  /* Diff */
+  .diff-new { background: #DCFCE7; padding: 1px 4px; border-radius: 3px; }
+  .diff-removed { background: #FEE2E2; padding: 1px 4px; border-radius: 3px; text-decoration: line-through; }
+  .diff-changed { background: #FEF3C7; padding: 1px 4px; border-radius: 3px; }
+
+  /* Summary bar */
+  .summary-bar { display: flex; gap: 20px; padding: 14px 18px; background: var(--gray-50); border-radius: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+  .summary-item { font-size: 13px; color: var(--gray-700); }
+  .summary-item strong { color: var(--gray-900); }
+
+  /* Diff section */
+  .diff-section { margin-top:20px; border-top:2px solid var(--gray-200); padding-top:20px; }
+  .diff-section h3 { font-size:16px; margin-bottom:12px; }
+
+  /* Full content toggle */
+  .full-content-toggle { margin-top: 12px; }
+  .full-content-toggle button {
+    font-size: 12px; color: var(--primary); background: none; border: none;
+    cursor: pointer; text-decoration: underline;
+  }
+  .full-content { display: none; margin-top: 8px; max-height: 400px; overflow: auto;
+    padding: 12px; background: var(--gray-50); border-radius: 8px; font-size: 12px;
+    white-space: pre-wrap; line-height: 1.7; color: var(--gray-700);
+  }
+
+  .no-data { text-align: center; padding: 40px; color: var(--gray-500); font-size: 14px; }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .compare-grid { grid-template-columns: 1fr; }
+    .header { padding: 16px; }
+    .container { padding: 12px 8px; }
+    .comparison-section { padding: 16px; }
+    .timeline-bar { padding: 12px 16px; }
+    .stats-bar { padding: 12px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>📋 KOL项目组会议纪要对比工具</h1>
+  <p>所有会议纪要已内置，打开即可预览和对比。最新一次 vs 最近一次，逐对对比。</p>
+</div>
+
+<div class="container">
+
+  <!-- Stats Bar -->
+  <div class="stats-bar" id="statsBar">
+    <span class="stat">收录会议：<strong id="statMeetings">0</strong> 份</span>
+    <span class="stat">对比组数：<strong id="statPairs">0</strong> 组</span>
+    <span class="stat">时间跨度：<strong id="statSpan">-</strong></span>
+  </div>
+
+  <!-- Timeline -->
+  <div class="timeline-bar" id="timelineBar">
+    <span class="label">会议时间线：</span>
+  </div>
+
+  <!-- Comparison Section -->
+  <div class="comparison-section">
+    <div class="comparison-header">
+      <h2>📊 相邻会议纪要对比</h2>
+      <div class="nav-tabs" id="navTabs"></div>
+    </div>
+    <div id="comparisonContent"></div>
+  </div>
+
+</div>
+
+<script>
+// ============ All meeting data embedded inline ============
+const meetings = [
+  // ===== 1: 260227 =====
+  {
+    "id": "260227",
+    "date": new Date(2026, 1, 27),
+    "title": "KOL项目组周会纪要260227",
+    "conclusions": [
+      "三大产品按计划推进，本周完成数据审查与AI客服评估",
+      "50个KOL客户必须分层，集中资源投入高价值客户",
+      "志斌必须掌握AI工具，伟文持续手把手指导",
+      "探索内容裂变策略（同一核心故事多平台表达），小规模尝试跨平台",
+      "KOL小程序新增板块（差多少播放量达到YPP，达到后实际盈利是多少）"
+    ],
+    "topics": [
+      "产品进展（后台统计/AI客服/小程序）",
+      "KOL客户分层策略",
+      "团队管理(志斌AI使用)",
+      "跨平台探索与内容裂变"
+    ],
+    "actions": [
+      {"task": "Dashboard数据审查与达人分层", "who": "Rachel、伟文、老板", "when": "本周内", "pri": "高"},
+      {"task": "AI客服测试结果评估", "who": "志斌", "when": "今日/明日", "pri": "高"},
+      {"task": "催促接近YPP的达人更新", "who": "志斌", "when": "本周内", "pri": "高"},
+      {"task": "KOL小程序开发完成", "who": "Rachel", "when": "3月7日", "pri": "中"},
+      {"task": "志斌AI工具使用指导", "who": "伟文", "when": "持续进行", "pri": "中"},
+      {"task": "跨平台小规模测试", "who": "Rachel", "when": "待定", "pri": "低"}
+    ],
+    "fullText": "会议主题：年前客户计划工作进展汇报\n参会人员：Rachel、伟文、老板、晓筠\n\n核心结论：\n1. 三大产品按计划推进，本周完成数据审查与AI客服评估\n2. 50个KOL客户必须分层，集中资源投入高价值客户\n3. 志斌必须掌握AI工具，伟文持续手把手指导\n4. 探索内容裂变策略，小规模尝试跨平台\n5. KOL小程序新增板块\n\n产品进展：\n- 后台统计系统：开发中\n- AI客服：测试中\n- KOL小程序：开发中，3月7日前完成\n\nKOL客户分层策略：\n- 50个KOL差异巨大，头部接近YPP\n- 执行分层运营，重点投入高潜力客户"
+  },
+  // ===== 2: 0306 =====
+  {
+    "id": "0306",
+    "date": new Date(2026, 2, 6),
+    "title": "KOL项目组周会纪要0306",
+    "conclusions": [
+      "KOL小程序完成设计提升与真实数据接入，MVP版本拟下周落地并选取9个头部达人试用",
+      "Dashboard完成信息架构重构，聚焦头部达人运营，优先推动高盈利希望的16个达人工作",
+      "50个KOL中约20%的YPD具备收益潜力，达人海外变现以广告、YouTube小商品挂载为主",
+      "确定三大挖客渠道：AI内容生产、社交互动工具、出海信息爬取",
+      "强化AI工具应用，以AI主产+人工审核模式推进账号内容创作",
+      "客服端完成第一版规则落地，后续将结合AI优化记录"
+    ],
+    "topics": [
+      "产品进展(KOL小程序/Dashboard)",
+      "KOL客户运营策略",
+      "挖客渠道规划",
+      "AI工具应用与客服优化"
+    ],
+    "actions": [
+      {"task": "KOL小程序MVP版本落地，交付团队使用", "who": "Rachel", "when": "下周", "pri": "高"},
+      {"task": "Dashboard重构后落地，支撑16个头部达人运营", "who": "团队", "when": "尽快", "pri": "高"},
+      {"task": "客服端报告AI优化，开展生成建议版块代码研究", "who": "团队", "when": "持续推进", "pri": "高"},
+      {"task": "推进达人YouTube小商品挂载模式研究，联动anymize团队", "who": "团队", "when": "持续推进", "pri": "中"},
+      {"task": "搭建三大挖客渠道，启动AI内容生产、工具开发、信息爬取", "who": "团队", "when": "尽快启动", "pri": "中"},
+      {"task": "自有出海账号内容上线，AI生产+人工审核发布", "who": "团队", "when": "持续更新", "pri": "中"}
+    ],
+    "fullText": "会议主题：KOL小程序与Dashboard优化\n参会人员：老板、Rachel、伟文、晓筠\n\n核心结论：\n- KOL小程序完成设计提升与真实数据接入\n- Dashboard完成信息架构重构\n- 50个KOL中约20%具备收益潜力\n- 确定三大挖客渠道\n- 强化AI工具应用"
+  },
+  // ===== 3: 0313 =====
+  {
+    "id": "0313",
+    "date": new Date(2026, 2, 13),
+    "title": "KOL项目组周会纪要0313",
+    "conclusions": [
+      "微信小程序因UI细节差距及设计文件不详尽，上线时间推迟，将采用新账号开发",
+      "微信客服系统已接入阿里云并上线，实现消息分流，完成版本优化",
+      "明确达人运营策略，不再依赖anymore方，自主运营头部达人",
+      "确定AI协作核心模式：由主调AI指挥执行层AI完成具体任务",
+      "小红书内容创作已搭建AI生成+人工审核流程，目前存在账号不足问题",
+      "流程图新功能可在对话中直接绘制、调整"
+    ],
+    "topics": [
+      "产品进展(微信小程序/客服系统)",
+      "达人运营策略调整",
+      "AI协作模式确立",
+      "小红书内容创作与账号问题"
+    ],
+    "actions": [
+      {"task": "微信小程序优化(新账号开发、UI调整、AI协作流程优化)", "who": "团队", "when": "-", "pri": "高"},
+      {"task": "微信客服系统优化(聊天窗口样式、历史记录、流程图功能)", "who": "团队", "when": "-", "pri": "高"},
+      {"task": "达人运营计划推进(商业链路打通、产品解决方案、15万投入跟进)", "who": "团队", "when": "-", "pri": "高"},
+      {"task": "小红书账号补充(评估购买、询问账号成本)", "who": "老板/Rachel", "when": "-", "pri": "高"},
+      {"task": "优化AI协作流程，解决AI模型协作冲突问题", "who": "团队", "when": "-", "pri": "高"},
+      {"task": "利用cloud code修改达人视频标题标签为日文", "who": "团队", "when": "-", "pri": "中"}
+    ],
+    "fullText": "会议主题：微信小程序与客服系统开发\n参会人员：老板、Rachel、伟文、晓筠\n\n核心结论：\n- 微信小程序因UI差距推迟上线\n- 微信客服系统已接入阿里云\n- 明确达人运营策略，不再依赖anymore方\n- 确定AI协作核心模式\n- 小红书内容创作已搭建AI生成+人工审核流程"
+  },
+  // ===== 4: 0320 =====
+  {
+    "id": "0320",
+    "date": new Date(2026, 2, 20),
+    "title": "KOL项目组周会纪要0320",
+    "conclusions": [
+      "AI助手存在交互体验不佳、意图识别偏差等问题，伟文整理用户常用问法及转化问法",
+      "探讨AI助手使用场景迁移至企业微信，直接开发自动化流程替代小程序存在法律风险",
+      "明确项目分阶段目标：第一阶段完成素材归集及AI化加工，第二阶段实现达人内容海外销售",
+      "确定AI协作核心模式：AI不替代人类思考，仅作为学习工具和框架搭建者",
+      "Rachel负责规划用于AI内容营销落地的公司官网建设"
+    ],
+    "topics": [
+      "AI助手优化与意图识别",
+      "自动化流程调研与法律风险评估",
+      "项目分阶段目标规划",
+      "官网建设规划"
+    ],
+    "actions": [
+      {"task": "整理用户常用问法及转化后标准问法，优化AI助手意图识别效果", "who": "伟文", "when": "-", "pri": "高"},
+      {"task": "调研普通群聊转企业微信、网页端自动化沟通的可行性", "who": "Rachel", "when": "-", "pri": "高"},
+      {"task": "研究自动化流程开发相关法律风险", "who": "伟文、Rachel", "when": "-", "pri": "高"},
+      {"task": "规划用于AI内容营销落地的公司官网建设", "who": "Rachel", "when": "-", "pri": "高"},
+      {"task": "向老板同步项目下一阶段具体发展目标", "who": "Rachel", "when": "-", "pri": "高"},
+      {"task": "优化AI协作流程，落实边学习、边创作模式", "who": "全体", "when": "-", "pri": "中"}
+    ],
+    "fullText": "会议主题：AI助手优化与自动化流程讨论\n参会人员：老板、Rachel、伟文、晓筠\n\n核心结论：\n- AI助手交互体验不佳，意图识别有偏差\n- 探讨AI助手迁移至企业微信\n- 明确项目分阶段目标\n- AI不替代人类思考\n- Rachel负责官网建设规划"
+  },
+  // ===== 5: 0410 =====
+  {
+    "id": "0410",
+    "date": new Date(2026, 3, 10),
+    "title": "KOL项目组周会纪要0410",
+    "conclusions": [
+      "AI获客账号优化：适配小红书改为图文结合形式，以出海人视角弱化专业术语",
+      "AI协作流程：确立主调度(GM)统一协调、复杂任务拆分多AI角色模式",
+      "云手机项目：已完成技术验证与全自动养号闭环，下一阶段用RPA实现内容发布自动化",
+      "项目管理规范：保持AI单组对话避免信息分裂，及时纠正AI输出偏差"
+    ],
+    "topics": [
+      "AI获客账号优化与内容策略",
+      "AI协作流程与工具选型",
+      "云手机项目规划与成本优化",
+      "项目管理规范"
+    ],
+    "actions": [
+      {"task": "细化并输出详细的AI获客流程，明确留言应答逻辑", "who": "团队", "when": "-", "pri": "高"},
+      {"task": "启动云手机内容发布自动化流程(RPA)开发", "who": "团队", "when": "-", "pri": "高"},
+      {"task": "研究评估不同代理方案成本", "who": "团队", "when": "-", "pri": "高"},
+      {"task": "计算单台云手机支持账号数", "who": "团队", "when": "-", "pri": "高"},
+      {"task": "探讨云手机商业化模式，下周复盘", "who": "团队", "when": "下周", "pri": "高"},
+      {"task": "让AI绘制获客流程图", "who": "团队", "when": "-", "pri": "中"}
+    ],
+    "fullText": "会议主题：AI获客账号优化、AI协作流程、云手机项目规划\n参会人员：老板、Rachel、伟文、晓筠\n\n核心结论：\n- AI获客账号适配小红书图文结合形式\n- AI协作：主调度统一协调\n- 云手机：完成技术验证与全自动养号闭环\n- 项目管理：保持AI单组对话避免信息分裂"
+  },
+  // ===== 6: 0417 (NEW) =====
+  {
+    "id": "0417",
+    "date": new Date(2026, 3, 17),
+    "title": "KOL项目组周会纪要0417",
+    "conclusions": [
+      "AI内容生成：当前存在数据作假、AI味重、主题提炼不准、小红书内容播放与互动差等问题，需优化形式、简化内容、提升可读性",
+      "获客与漏斗：采用矩阵号AI洗号获客，避免封号、提升曝光；重新定义客群画像与获客漏斗，明确话术、接单条件与阶段完成标准",
+      "人设与运营：弃用数据专家拗口人设，改为好奇型出海探索者人设，小红书与公众号人设差异化运营",
+      "云手机与产品：已完成TikTok自动化、后台优化、流量与成本测试；优先聚焦B2轻量化代运营，不做通用SaaS，探索垂直出海云手机服务",
+      "客户与效率：现有客户盈利比例低，需用AI快速筛选高价值客户；主动触达高收入KOL提升转化",
+      "出差与交接：下周二/三前往深圳拜访Anymind团队取经；完成建行卡财务交接事宜"
+    ],
+    "topics": [
+      "AI内容生成优化",
+      "获客策略与漏斗设计",
+      "人设与账号运营",
+      "云手机项目与产品聚焦",
+      "客户筛选与转化",
+      "出差与财务交接"
+    ],
+    "actions": [
+      {"task": "与AI对齐矩阵号曝光可行性、接入话术、流量承接、接单条件", "who": "团队", "when": "-", "pri": "高"},
+      {"task": "明确小红书获客方法，定义第一/第二阶段完成标准", "who": "团队", "when": "-", "pri": "高"},
+      {"task": "重新梳理用户画像、痛点、转化路径与漏斗开口，调整选题", "who": "团队", "when": "-", "pri": "高"},
+      {"task": "从盈利视角重新定义客户画像，明确转化方向", "who": "团队", "when": "-", "pri": "高"},
+      {"task": "重新规划项目优先级，用AI+外部数据优化业务方向", "who": "团队", "when": "-", "pri": "高"},
+      {"task": "下周二/三前往深圳拜访Anymind团队，获取出海运营经验", "who": "团队", "when": "-", "pri": "高"},
+      {"task": "整理会议纪要并将逐字稿归档至录音附件", "who": "团队", "when": "-", "pri": "高"},
+      {"task": "重新设计获客漏斗模型，明确各环节转化重点", "who": "团队", "when": "-", "pri": "高"},
+      {"task": "与AI明确B2模式产品功能与服务包细节", "who": "团队", "when": "-", "pri": "高"},
+      {"task": "研究境外手机号卡服务的可行性与合规风险", "who": "团队", "when": "-", "pri": "中"},
+      {"task": "将建行卡交给阿琪琪完成财务交接", "who": "团队", "when": "-", "pri": "中"}
+    ],
+    "fullText": "会议主题：出海业务问题探讨、AI内容生成与获客策略优化\n参会人员：KOL项目组全体成员\n\n核心结论：\n1. AI内容生成存在数据作假、AI味重、主题提炼不准\n2. 获客与漏斗：矩阵号AI洗号获客\n3. 人设改为好奇型出海探索者\n4. 云手机：优先聚焦B2轻量化代运营\n5. 客户盈利比例低，需AI筛选高价值客户\n6. 下周二/三前往深圳拜访Anymind团队"
+  },
+  // ===== 7: 0424 (NEW) =====
+  {
+    "id": "0424",
+    "date": new Date(2026, 3, 24),
+    "title": "KOL项目组周会纪要0424",
+    "conclusions": [
+      "工作进展：完成抖音监控脚本优化、800家希尔顿酒店信息更新；日报已从飞书文档改为多维表格并同步共享",
+      "用户获客与痛点：按4个阶段梳理用户痛点，对标小红书出海类账号优化选题与内容方向",
+      "AI应用优化：当前AI仅用于一次性任务，需转向持续自动化运营；解决对话跑偏、费用高、网络不稳定等问题",
+      "客户解约处理：皮蛋solo粥因日文内容顾虑提出解约，需明确违约条款、损失告知与诉求沟通，争取挽回或合规收尾",
+      "会议与协作：因10:30/10:40需与KOL开会，本次会议提速推进；纪要逐字稿需发至工作群"
+    ],
+    "topics": [
+      "技术与日常工作(抖音监控/酒店数据/日报)",
+      "用户痛点与获客策略",
+      "AI使用现状与持续优化",
+      "客户解约处理与风险管控"
+    ],
+    "actions": [
+      {"task": "完成飞书日报转多维表格，共享给老板", "who": "团队", "when": "-", "pri": "高"},
+      {"task": "将会议纪要录音逐字稿发送至工作群", "who": "团队", "when": "-", "pri": "中"},
+      {"task": "与皮蛋solo粥客户沟通解约诉求，说明违约赔偿与账号损失", "who": "团队", "when": "-", "pri": "高"},
+      {"task": "按4阶段用户痛点优化内容选题，对标出海账号迭代方向", "who": "团队", "when": "-", "pri": "高"},
+      {"task": "设计AI持续运营流程(如每日自动发布)，替代仅一次性任务", "who": "团队", "when": "-", "pri": "高"},
+      {"task": "优化AI使用方式，解决对话跑偏、费用消耗快问题", "who": "团队", "when": "-", "pri": "中"},
+      {"task": "调试Openvpn网络稳定性，保障AI工具正常使用", "who": "团队", "when": "-", "pri": "中"},
+      {"task": "持续维护抖音监控与下载脚本，保障运行稳定", "who": "团队", "when": "-", "pri": "中"}
+    ],
+    "fullText": "会议主题：本周工作进展、AI运营应用、用户痛点梳理及客户解约问题\n参会人员：老板、Rachel、伟文、晓筠\n\n核心结论：\n1. 完成抖音监控脚本优化、800家酒店信息更新\n2. 按4阶段梳理用户痛点\n3. AI仅用于一次性任务，需转向持续自动化\n4. 皮蛋solo粥因日文内容顾虑提出解约\n5. 日报已改为多维表格"
+  },
+  // ===== 8: 0508 (NEW) =====
+  {
+    "id": "0508",
+    "date": new Date(2026, 4, 8),
+    "title": "KOL项目组周会纪要0508",
+    "conclusions": [
+      "工作进展与订单情况：完成800多家酒店数据全流程跑批；达人内容发布兼容多阶段流程，计划接入视频横竖屏自动转换工具；累计产生四五笔酒店相关订单，但因客户后端系统未对接，暂未产生收入",
+      "AI工具应用：明确AI使用需以目标为导向、主动学习探索，避免被动返工；需沉淀使用经验、建立规范流程",
+      "业务与账号运营：视频业务需关注爆款持续性，2名KOL接近YPP标准；打盗版业务暂不适合收费；部分IPP账号存在刷粉刷量现象",
+      "工作理念与成长：反对拿死工资、被动执行，强调工作自主性；调整心态，将AI视为成长伙伴而非压力源",
+      "获客与流程建设：需研究Saleskey获客方式，寻找首个非正业介绍客户；推进视频制作全流程测试优化"
+    ],
+    "topics": [
+      "酒店数据与订单推进",
+      "达人与视频业务优化",
+      "AI工具应用规范与经验沉淀",
+      "打盗版业务与账号管理",
+      "获客渠道拓展"
+    ],
+    "actions": [
+      {"task": "总结AI使用中的问题、失败原因及解决方法，形成经验教训供团队参考", "who": "团队", "when": "-", "pri": "高"},
+      {"task": "探索优化AI生成视频流程，高效实现脚本到音频、视频的转化", "who": "团队", "when": "-", "pri": "高"},
+      {"task": "分享AI协作经验，明确与AI协作的监督程度，实现高效配合", "who": "团队", "when": "-", "pri": "高"},
+      {"task": "研究Saleskey，寻找首个非正业介绍的客户", "who": "团队", "when": "-", "pri": "高"},
+      {"task": "跟进客户后端系统对接进度，推动已产生订单变现", "who": "团队", "when": "-", "pri": "高"},
+      {"task": "推进视频横竖屏比例互换自动发布工具的接入工作", "who": "团队", "when": "-", "pri": "中"},
+      {"task": "持续维护酒店数据更新，优化IP切换等应对限流的方法", "who": "团队", "when": "-", "pri": "中"},
+      {"task": "用版权保护工具助力接近YPP标准的KOL账号成长", "who": "团队", "when": "-", "pri": "中"},
+      {"task": "规范IPP账号运营，杜绝刷粉刷量行为", "who": "团队", "when": "-", "pri": "中"},
+      {"task": "探索打盗版高效方法，持续跟踪盗版打击效果", "who": "团队", "when": "-", "pri": "中"}
+    ],
+    "fullText": "会议主题：团队工作进展、收入目标、AI工具应用及业务优化\n参会人员：老板、Rachel、伟文、晓筠\n\n核心结论：\n1. 完成800多家酒店数据全流程跑批\n2. AI使用需以目标为导向\n3. 2名KOL接近YPP标准\n4. 反对被动执行，强调工作自主性\n5. 研究Saleskey获客方式"
+  },
+  // ===== 9: 0515 (NEW) =====
+  {
+    "id": "0515",
+    "date": new Date(2026, 4, 15),
+    "title": "KOL项目组周会纪要0515",
+    "conclusions": [
+      "项目进展：完成自动评论、触达号搭建、自动化频道管理、视频横竖屏互换链路；解决达人上传与INS大文件报错；800间酒店信息基本完成，5月订单增长",
+      "账号管理：原40+账号仅10个可登录，因买号、无绑定、IP单一被Google封禁；后续改用达人自注册+付费托管，优先非Gmail邮箱+绑定手机号",
+      "获客策略：以副业做YouTube人设运营触达号，自动评论触达用户，本周内触达≥30人；评估多账号并行运行",
+      "项目规划：全员拆分任务、制定模块计划，本周五汇总整体计划；本周三前提交各模块细化方案",
+      "媒体矩阵：搭建官网+公众号+小红书联动，参考现有推文发文并提升阅读量",
+      "财务结算：与皮蛋solo按季度结算，6月打款，需与郑哥确认公司收款账户",
+      "工作方法：强化多任务处理与里程碑拆分；开会前可用AI校验发言与总结"
+    ],
+    "topics": [
+      "自动化技术与工具开发",
+      "账号登录安全与管理制度",
+      "获客触达策略",
+      "项目规划与任务拆分",
+      "媒体矩阵建设",
+      "款项结算"
+    ],
+    "actions": [
+      {"task": "观察触达号效果，下周前触达≥30人，评估多号运行", "who": "团队", "when": "下周", "pri": "高"},
+      {"task": "联系AnyMind获取账号所有者转移方案", "who": "团队", "when": "-", "pri": "高"},
+      {"task": "将达人自注册、付费托管、邮箱选型规则发至工作群", "who": "团队", "when": "-", "pri": "高"},
+      {"task": "制定官网+公众号+小红书联动计划，发文并提升阅读量", "who": "团队", "when": "-", "pri": "高"},
+      {"task": "与郑哥确认皮蛋solo季度结算的公司打款账户", "who": "团队", "when": "-", "pri": "高"},
+      {"task": "本周三前提交各模块细化工作计划", "who": "团队", "when": "本周三", "pri": "高"},
+      {"task": "本周五讨论并汇总形成整体项目计划", "who": "团队", "when": "本周五", "pri": "高"},
+      {"task": "探索电脑端私信沟通功能实现", "who": "团队", "when": "-", "pri": "中"},
+      {"task": "完善酒店集团信息处理与订单匹配脚本", "who": "团队", "when": "-", "pri": "中"}
+    ],
+    "fullText": "会议主题：项目进展、账号管理、获客策略、媒体矩阵及工作计划\n参会人员：KOL项目组全体成员\n\n核心结论：\n1. 完成自动评论、触达号搭建、视频横竖屏互换链路\n2. 40+账号仅10个可登录，改用达人自注册+付费托管\n3. 以副业做YouTube人设运营触达号，本周内触达≥30人\n4. 全员拆分任务、制定模块计划\n5. 搭建官网+公众号+小红书联动\n6. 皮蛋solo季度结算，6月打款"
+  },
+  // ===== 10: 0529 (NEW) =====
+  {
+    "id": "0529",
+    "date": new Date(2026, 4, 29),
+    "title": "KOL项目组周会纪要0529",
+    "conclusions": [
+      "工作成果：完成新版PPT与logo制作；依托AI完成全阶段产品规划，细化各阶段任务",
+      "产品阶段规划：明确四阶段产品迭代节奏，现阶段产品进度20%，联合伟文完成基础功能后产品可达60分；7月推进PMF阶段验证真实用户需求",
+      "双业务模式定位：延续现有50个成熟KOL代运营模式；推出速达诊断报告工具，面向全网创作者轻量化引流",
+      "产品服务体系搭建：包含文娱诊断报告、自动运营增速包、申诉包；报告划分三个版本",
+      "市场与客户运营优化：摒弃闭门造车模式，通过多渠道主动对接客户、KOL；优化客户筛选逻辑，聚焦高价值客群",
+      "阶段性工作安排：已筛选6名达人启动Facebook诊断，2-3天输出初稿；本周优化AI诊断内容，下周输出正式版报告"
+    ],
+    "topics": [
+      "品牌物料与账号运营",
+      "产品迭代开发与PMF验证",
+      "双业务模式落地",
+      "AI诊断报告项目",
+      "市场客户对接与需求调研"
+    ],
+    "actions": [
+      {"task": "完成港海一周飞书总结汇报，同步项目阶段性进展", "who": "团队", "when": "-", "pri": "高"},
+      {"task": "完成达人筛选、数据采集工作，优化AI诊断内容至合格标准", "who": "团队", "when": "-", "pri": "高"},
+      {"task": "2-3日内输出AI诊断报告初版、原稿，提交审核校对", "who": "团队", "when": "2-3日", "pri": "高"},
+      {"task": "下周完成优化，输出正式版AI诊断报告", "who": "团队", "when": "下周", "pri": "高"},
+      {"task": "采购手机号，完成活客号注册重建工作", "who": "团队", "when": "-", "pri": "高"},
+      {"task": "重新整理并发送产品介绍、测试报告至相关对接人员", "who": "团队", "when": "-", "pri": "高"},
+      {"task": "对接现有客户及50个合作KOL，调研真实需求，优化产品规划", "who": "团队", "when": "-", "pri": "高"},
+      {"task": "当日下午讨论招人相关事宜", "who": "团队", "when": "当日", "pri": "高"},
+      {"task": "联合伟文推进产品基础功能开发，达成60分基础标准", "who": "团队", "when": "-", "pri": "中"},
+      {"task": "对接汇丰等重点客户，提供产品Demo，收集优化反馈", "who": "团队", "when": "-", "pri": "中"}
+    ],
+    "fullText": "会议主题：产品VI优化、AI辅助规划、KOL业务模式、诊断报告与市场沟通\n参会人员：老板、Rachel、伟文、晓筠\n\n核心结论：\n1. 完成新版PPT与logo制作\n2. 四阶段产品迭代：当前20%，基础功能后达60分\n3. 双业务模式：KOL代运营 + 诊断报告引流\n4. 产品服务体系：诊断报告、增速包、申诉包\n5. 摒弃闭门造车，多渠道对接客户\n6. 已筛选6名达人启动Facebook诊断"
+  },
+  // ===== 11: 0605 (NEW) =====
+  {
+    "id": "0605",
+    "date": new Date(2026, 5, 5),
+    "title": "KOL项目组周会会议纪要0605",
+    "conclusions": [
+      "明确运营报告→Agent→媒体库→品牌资源对接的发展路径",
+      "当前重点从产品开发转向市场需求验证",
+      "长期方向为平台模式，而非单纯代运营模式",
+      "产品价值必须来源于客户需求",
+      "AI定位为辅助决策与发现问题的工具"
+    ],
+    "topics": [
+      "商业模式与平台路径",
+      "客户需求验证",
+      "运营报告与Agent服务",
+      "AI应用定位"
+    ],
+    "actions": [
+      {"task": "官网初版提交审阅", "who": "伟文", "when": "下周周会前", "pri": "高"},
+      {"task": "开展目标用户访谈", "who": "项目组", "when": "下周周会前", "pri": "高"},
+      {"task": "收集运营报告反馈", "who": "项目组", "when": "下周周会前", "pri": "高"},
+      {"task": "验证运营报告付费意愿", "who": "项目组", "when": "下周周会前", "pri": "高"},
+      {"task": "完成API充值申请", "who": "伟文", "when": "本周", "pri": "中"},
+      {"task": "完成5月订单结算", "who": "伟文", "when": "本周", "pri": "中"},
+      {"task": "研究CJ模式及相关案例", "who": "项目组", "when": "持续推进", "pri": "中"}
+    ],
+    "fullText": "会议主题：KOL项目商业模式与产品价值讨论\n参会人员：老板、Rachel、伟文、晓筠\n\n核心结论：\n1. 明确运营报告→Agent→媒体库→品牌资源对接的发展路径\n2. 当前重点从产品开发转向市场需求验证\n3. 长期方向为平台模式\n4. 产品价值必须来源于客户需求\n5. AI定位为辅助决策与发现问题的工具\n\n待验证事项：\n- 运营报告用户付费意愿\n- Agent服务续费能力\n- 媒体库竞争壁垒\n- CJ模式适用性\n\n老板思考题：\n- 我们的业务本质是什么？\n- 客户真正需要什么？\n- 为什么客户愿意付费？\n- 为什么建设媒体库？\n- 为什么参考CJ模式？\n- 迪士尼和泡泡玛特为什么成功？"
+  },
+  // ===== 12: 0612 =====
+  {
+    "id": "0612",
+    "date": new Date(2026, 5, 12),
+    "title": "KOL项目组周会纪要0612",
+    "conclusions": [
+      "运营报告已获得初步市场反馈，需继续扩大漏斗验证",
+      "诊断报告入口将接入智能体降低信任门槛",
+      "账号体系重建支撑后续测试",
+      "代运营升级为海外内容资产管理",
+      "AI逐步进入流程自动化"
+    ],
+    "topics": [
+      "运营报告与漏斗验证",
+      "诊断报告与智能体接入",
+      "账号体系建设",
+      "商业模式升级",
+      "AI应用深化"
+    ],
+    "actions": [
+      {"task": "扩大漏斗验证", "who": "项目组", "when": "下周", "pri": "高"},
+      {"task": "诊断报告接入智能体", "who": "项目组", "when": "下周", "pri": "高"},
+      {"task": "新建小红书账号", "who": "待确认", "when": "待手机号", "pri": "中"},
+      {"task": "重建Google/Youtube账号", "who": "项目组", "when": "本周", "pri": "高"},
+      {"task": "达人打款推进", "who": "相关负责人", "when": "6月", "pri": "中"},
+      {"task": "研究CJ模式", "who": "项目组", "when": "持续", "pri": "高"}
+    ],
+    "fullText": "会议主题：KOL代运营及AI应用会\n参会人员：老板、Rachel、伟文、晓筠\n\n核心结论：\n1. 运营报告已获得初步市场反馈\n2. 诊断报告入口将接入智能体\n3. 账号体系重建支撑后续测试\n4. 代运营升级为海外内容资产管理\n5. AI逐步进入流程自动化\n\n待验证事项：\n- 用户咨询是否转化\n- 报告付费意愿\n- 代运营升级路径\n- AI自动化收益\n\n老板思考题：\n- 为什么用户咨询但不转化\n- 为什么达人不绕过平台\n- CJ真正价值是什么\n- 如何进入交易结算环节\n- 哪些流程值得AI接管"
+  },
+  // ===== 13: 0626 =====
+  {
+    "id": "0626",
+    "date": new Date(2026, 5, 26),
+    "title": "KOL项目组周会纪要0626",
+    "conclusions": [
+      "达人匹配器开发推进中，数据采集存在难点，需持续完善",
+      "诊断报告反馈良性，部分用户按建议修改后数据提升，需提升识别精准度",
+      "科园A标书功能修复完成，待优化问题需持续推进",
+      "酒店业务GDS信息交付完成部分，API接口稳定性待提升",
+      "财务结算计划明确：7月初索要账号，7月底完成皮蛋费用结算"
+    ],
+    "topics": [
+      "达人匹配与合作进展",
+      "诊断报告优化与产品化",
+      "科园A标书功能优化",
+      "酒店业务与API稳定性",
+      "财务结算"
+    ],
+    "actions": [
+      {"task": "跟进成果和中案对接", "who": "项目组", "when": "持续", "pri": "高"},
+      {"task": "加快自动达人匹配器数据采集", "who": "项目组", "when": "持续", "pri": "高"},
+      {"task": "提升诊断报告识别和分析准确率", "who": "项目组", "when": "下周", "pri": "高"},
+      {"task": "科园A标书功能优化", "who": "项目组", "when": "持续", "pri": "中"},
+      {"task": "酒店API接口稳定性提升", "who": "项目组", "when": "持续", "pri": "中"},
+      {"task": "7月初向皮蛋索要账号", "who": "相关负责人", "when": "7月初", "pri": "高"},
+      {"task": "7月底完成皮蛋费用结算", "who": "相关负责人", "when": "7月底", "pri": "高"}
+    ],
+    "fullText": "会议主题：业务进展及优化方向讨论\n参会人员：老板、Rachel、伟文、晓筠\n\n核心结论：\n1. 达人匹配器开发推进中\n2. 诊断报告反馈良性\n3. 科园A标书功能修复完成\n4. 酒店业务GDS信息交付完成部分\n5. 财务结算：7月初索要账号，7月底完成结算\n\n待验证事项：\n- 达人匹配效率是否达标\n- 诊断报告产品上线后用户留存\n- 科园A标书AI解释效果\n- 酒店数据更新自动化收益\n- 皮蛋费用结算流程顺畅度"
+  }
+];
+// ============ END OF DATA ============
+
+function init() {
+  renderStats();
+  renderTimeline();
+  renderAllComparisons();
+}
+
+function renderStats() {
+  document.getElementById('statMeetings').textContent = meetings.length;
+  document.getElementById('statPairs').textContent = meetings.length - 1;
+  const first = meetings[0].date.toLocaleDateString('zh-CN', {month:'2-digit', day:'2-digit'});
+  const last = meetings[meetings.length-1].date.toLocaleDateString('zh-CN', {month:'2-digit', day:'2-digit'});
+  document.getElementById('statSpan').textContent = `${first} ~ ${last}`;
+}
+
+function renderTimeline() {
+  const bar = document.getElementById('timelineBar');
+  let html = '<span class="label">会议时间线：</span>';
+  meetings.forEach((m, i) => {
+    const d = m.date.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' });
+    html += `<div class="timeline-dot" data-date="${d}" title="${escapeHtml(m.title)}"></div>`;
+    if (i < meetings.length - 1) {
+      html += `<span class="timeline-arrow">→</span>`;
+    }
+  });
+  bar.innerHTML = html;
+}
+
+function renderAllComparisons() {
+  const pairs = [];
+  for (let i = meetings.length - 1; i >= 1; i--) {
+    pairs.push({ old: meetings[i - 1], new_: meetings[i], index: pairs.length });
+  }
+  pairs.reverse();
+
+  const navTabs = document.getElementById('navTabs');
+  navTabs.innerHTML = pairs.map((p, i) => {
+    const oldD = p.old.date.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' });
+    const newD = p.new_.date.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' });
+    return `<button class="nav-tab ${i === 0 ? 'active' : ''}" data-index="${i}" onclick="switchTab(${i})">${oldD} → ${newD}</button>`;
+  }).join('');
+
+  const content = document.getElementById('comparisonContent');
+  content.innerHTML = pairs.map((p, i) => {
+    return `<div class="compare-pair" id="pair-${i}" style="${i === 0 ? '' : 'display:none;'}">
+      ${renderPairComparison(p.old, p.new_)}
+    </div>`;
+  }).join('');
+}
+
+function renderPairComparison(oldM, newM) {
+  const oldDate = oldM.date.toLocaleDateString('zh-CN');
+  const newDate = newM.date.toLocaleDateString('zh-CN');
+
+  const oldC = oldM.conclusions.length;
+  const newC = newM.conclusions.length;
+  const oldA = oldM.actions.length;
+  const newA = newM.actions.length;
+
+  let html = `
+    <div class="summary-bar">
+      <div class="summary-item"><strong>${oldDate}</strong>：结论 ${oldC} 条 / 行动 ${oldA} 项</div>
+      <div class="summary-item"><strong>${newDate}</strong>：结论 ${newC} 条 / 行动 ${newA} 项</div>
+      <div class="summary-item">结论变化：<strong>${newC > oldC ? '+' : ''}${newC - oldC}</strong></div>
+      <div class="summary-item">行动事项变化：<strong>${newA > oldA ? '+' : ''}${newA - oldA}</strong></div>
+    </div>
+    <div class="compare-grid">
+      ${renderPanel(oldM, 'old', oldDate)}
+      ${renderPanel(newM, 'new', newDate)}
+    </div>
+    ${renderDiff(oldM, newM)}
+  `;
+  return html;
+}
+
+function renderPanel(meeting, type, dateStr) {
+  const cls = type === 'old' ? 'panel-old' : 'panel-new';
+  let body = '';
+
+  // Conclusions
+  body += `<div class="section-block"><h4>📌 核心结论 (${meeting.conclusions.length}条)</h4><ol>`;
+  body += meeting.conclusions.map(c => `<li>${escapeHtml(c)}</li>`).join('');
+  body += `</ol></div>`;
+
+  // Topics
+  body += `<div class="section-block"><h4>📋 讨论议题</h4><ul>`;
+  body += meeting.topics.map(t => `<li>${escapeHtml(t)}</li>`).join('');
+  body += `</ul></div>`;
+
+  // Actions table
+  body += `<div class="section-block"><h4>✅ 行动事项 (${meeting.actions.length}项)</h4>`;
+  body += `<table><thead><tr><th>任务</th><th>负责人</th><th>时间</th><th>优先级</th></tr></thead><tbody>`;
+  body += meeting.actions.map(a =>
+    `<tr><td>${escapeHtml(a.task)}</td><td>${escapeHtml(a.who)}</td><td>${escapeHtml(a.when)}</td><td>${priBadge(a.pri)}</td></tr>`
+  ).join('');
+  body += `</tbody></table></div>`;
+
+  // Full text toggle
+  body += `<div class="full-content-toggle">
+    <button onclick="toggleFullContent(this)">📄 显示/隐藏完整会议内容</button>
+    <div class="full-content">${escapeHtml(meeting.fullText)}</div>
+  </div>`;
+
+  return `<div class="compare-panel ${cls}">
+    <div class="panel-header">
+      <span class="badge">${type === 'old' ? '📖 前次' : '🆕 最新'}</span>
+      ${dateStr}
+    </div>
+    <div class="panel-body">${body}</div>
+  </div>`;
+}
+
+function renderDiff(oldM, newM) {
+  const oldSet = new Set(oldM.conclusions);
+  const newSet = new Set(newM.conclusions);
+  const added = newM.conclusions.filter(c => !oldSet.has(c));
+  const removed = oldM.conclusions.filter(c => !newSet.has(c));
+
+  const oldATitles = new Set(oldM.actions.map(a => a.task));
+  const newATitles = new Set(newM.actions.map(a => a.task));
+  const addedActions = newM.actions.filter(a => !oldATitles.has(a.task));
+  const removedActions = oldM.actions.filter(a => !newATitles.has(a.task));
+
+  const oldT = new Set(oldM.topics);
+  const newT = new Set(newM.topics);
+  const addedTopics = newM.topics.filter(t => !oldT.has(t));
+  const removedTopics = oldM.topics.filter(t => !newT.has(t));
+
+  let html = `<div class="diff-section"><h3>🔄 变化对比分析</h3>`;
+
+  if (added.length > 0) {
+    html += `<div class="section-block"><h4 style="color:#16A34A;">➕ 新增结论 (${added.length}条)</h4><ul>`;
+    html += added.map(c => `<li><span class="diff-new">${escapeHtml(c)}</span></li>`).join('');
+    html += `</ul></div>`;
+  }
+  if (removed.length > 0) {
+    html += `<div class="section-block"><h4 style="color:#DC2626;">➖ 不再提及的结论 (${removed.length}条)</h4><ul>`;
+    html += removed.map(c => `<li><span class="diff-removed">${escapeHtml(c)}</span></li>`).join('');
+    html += `</ul></div>`;
+  }
+  if (addedActions.length > 0) {
+    html += `<div class="section-block"><h4 style="color:#16A34A;">➕ 新增行动事项 (${addedActions.length}项)</h4><ul>`;
+    html += addedActions.map(a => `<li><span class="diff-new">${escapeHtml(a.task)}</span> <span style="color:#6B7280;font-size:12px;">(${escapeHtml(a.who)})</span></li>`).join('');
+    html += `</ul></div>`;
+  }
+  if (removedActions.length > 0) {
+    html += `<div class="section-block"><h4 style="color:#DC2626;">➖ 已完成的/不再提及的行动事项 (${removedActions.length}项)</h4><ul>`;
+    html += removedActions.map(a => `<li><span class="diff-removed">${escapeHtml(a.task)}</span></li>`).join('');
+    html += `</ul></div>`;
+  }
+  if (addedTopics.length > 0 || removedTopics.length > 0) {
+    html += `<div class="section-block"><h4>📊 议题变化</h4>`;
+    if (addedTopics.length > 0) html += `<p style="color:#16A34A;font-size:13px;">新增议题：<span class="diff-new">${addedTopics.map(escapeHtml).join('、')}</span></p>`;
+    if (removedTopics.length > 0) html += `<p style="color:#DC2626;font-size:13px;">不再讨论：<span class="diff-removed">${removedTopics.map(escapeHtml).join('、')}</span></p>`;
+    html += `</div>`;
+  }
+
+  html += `</div>`;
+  return html;
+}
+
+// ============ Tab switching ============
+function switchTab(index) {
+  document.querySelectorAll('.nav-tab').forEach((t, i) => {
+    t.classList.toggle('active', i === index);
+  });
+  document.querySelectorAll('.compare-pair').forEach((p, i) => {
+    p.style.display = i === index ? '' : 'none';
+  });
+}
+
+function toggleFullContent(btn) {
+  const box = btn.nextElementSibling;
+  box.style.display = box.style.display === 'block' ? 'none' : 'block';
+}
+
+// ============ Helpers ============
+function priBadge(pri) {
+  if (!pri) return '-';
+  const p = pri.toLowerCase();
+  if (p === '高' || p === '高优先级') return '<span style="color:#DC2626;font-weight:700;">🔴 高</span>';
+  if (p === '中' || p === '中优先级') return '<span style="color:#D97706;font-weight:700;">🟡 中</span>';
+  if (p === '低' || p === '低优先级') return '<span style="color:#6B7280;font-weight:700;">⚪ 低</span>';
+  return escapeHtml(pri);
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+// ============ Init ============
+init();
+</script>
+</body>
+</html>
