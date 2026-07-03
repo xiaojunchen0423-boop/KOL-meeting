@@ -47,18 +47,20 @@
   .stats-bar .stat { font-size: 13px; color: var(--gray-700); }
   .stats-bar .stat strong { color: var(--primary); font-size: 18px; }
 
-  /* Timeline bar */
-  .timeline-bar {
-    display: flex; align-items: center; gap: 6px; padding: 16px 24px;
+  /* Date navigation bar */
+  .date-nav-bar {
+    display: flex; align-items: center; gap: 8px; padding: 14px 24px;
     background: #fff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.08);
     margin-bottom: 24px; flex-wrap: wrap; overflow-x: auto;
   }
-  .timeline-bar .label { font-size: 13px; color: var(--gray-500); font-weight: 600; margin-right: 4px; white-space: nowrap; }
-  .timeline-dot {
-    width: 12px; height: 12px; border-radius: 50%; background: var(--primary);
-    border: 2px solid var(--primary-light); flex-shrink: 0; cursor: default;
+  .date-nav-bar .label { font-size: 13px; color: var(--gray-500); font-weight: 600; margin-right: 4px; white-space: nowrap; }
+  .date-nav-btn {
+    padding: 6px 14px; border-radius: 8px; border: 1px solid var(--gray-200);
+    background: #fff; font-size: 12px; cursor: pointer; transition: all .2s; white-space: nowrap;
+    color: var(--gray-700);
   }
-  .timeline-arrow { color: var(--gray-300); font-size: 16px; }
+  .date-nav-btn:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+  .date-nav-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); font-weight: 600; }
 
   /* Comparison Section */
   .comparison-section {
@@ -154,9 +156,9 @@
     <span class="stat">时间跨度：<strong id="statSpan">-</strong></span>
   </div>
 
-  <!-- Timeline -->
-  <div class="timeline-bar" id="timelineBar">
-    <span class="label">会议时间线：</span>
+  <!-- Date Navigation -->
+  <div class="date-nav-bar" id="dateNavBar">
+    <span class="label">📅 已收录 14 场会议 · 时间跨度：2月27日 – 7月3日</span>
   </div>
 
   <!-- Comparison Section -->
@@ -569,13 +571,43 @@ const meetings = [
       {"task": "7月底完成皮蛋费用结算", "who": "相关负责人", "when": "7月底", "pri": "高"}
     ],
     "fullText": "会议主题：业务进展及优化方向讨论\n参会人员：老板、Rachel、伟文、晓筠\n\n核心结论：\n1. 达人匹配器开发推进中\n2. 诊断报告反馈良性\n3. 科园A标书功能修复完成\n4. 酒店业务GDS信息交付完成部分\n5. 财务结算：7月初索要账号，7月底完成结算\n\n待验证事项：\n- 达人匹配效率是否达标\n- 诊断报告产品上线后用户留存\n- 科园A标书AI解释效果\n- 酒店数据更新自动化收益\n- 皮蛋费用结算流程顺畅度"
+  },
+  // ===== 14: 0703 (NEW) =====
+  {
+    "id": "0703",
+    "date": new Date(2026, 6, 3),
+    "title": "KOL项目组周会纪要0703",
+    "conclusions": [
+      "AI营销系统四大模块(监测、输入、判断、输出)逻辑已明确，判断模块完成核心逻辑细化与新增输入源调试，下一步需明确产出标准、优化数据深度",
+      "酒店业务已梳理GDS系统痛点，后续将推进数据更新代运营合作，优先完成存量数据准确性校验",
+      "AI标书项目当前优先完成基础信息与保证金专题的七层架构验证，后续再覆盖其余七类内容",
+      "达人盘点报告存在内容同质化问题，需先优化行动建议颗粒度，再完成服务器端部署",
+      "财务端分销佣金票已开具，待回款；两千余元待收款项今日跟进处理，月度预计收入五六百元"
+    ],
+    "topics": [
+      "AI营销系统建设",
+      "酒店业务与GDS系统优化",
+      "AI标书项目推进",
+      "达人盘点报告优化",
+      "财务结算与回款"
+    ],
+    "actions": [
+      {"task": "与多AI工具沟通，明确达人内容数据分析报告输出形态，落实对应数据采集规则", "who": "团队", "when": "本周", "pri": "高"},
+      {"task": "对接酒店合作方，洽谈数据更新代运营收费模式", "who": "团队", "when": "本周", "pri": "高"},
+      {"task": "完成AI标书基础信息与保证金专题七层架构验证", "who": "团队", "when": "持续", "pri": "高"},
+      {"task": "优化达人盘点报告行动建议，完成服务器端部署", "who": "团队", "when": "下周", "pri": "高"},
+      {"task": "完成酒店存量数据准确性校验", "who": "团队", "when": "持续", "pri": "中"},
+      {"task": "跟进两千余元待收款项、分销佣金回款", "who": "团队", "when": "今日/近期", "pri": "高"},
+      {"task": "梳理AI营销七大方法论环节，锁定可优化关键节点", "who": "团队", "when": "本周", "pri": "中"}
+    ],
+    "fullText": "会议主题：AI营销与酒店业务相关事项讨论\n参会人员：老板、Rachel、伟文、晓筠\n记录人：陈晓筠\n\n核心结论：\n1. AI营销系统四大模块逻辑已明确，判断模块完成核心逻辑细化\n2. 酒店业务已梳理GDS系统痛点，推进数据更新代运营合作\n3. AI标书项目优先完成基础信息与保证金专题七层架构验证\n4. 达人盘点报告存在内容同质化问题，需优化行动建议颗粒度\n5. 财务端分销佣金票已开具，待回款\n\n重点讨论：\n- AI营销：需先明确报告最终输出形态再倒推数据采集，拒绝纯文字PPT，要求可视化图表\n- 酒店业务：优先保障数据准确性，可切入酒店数据更新代运营服务\n- AI标书：对标竞品优化，先完成核心模块验证\n- 达人盘点：报告需细化可落地的action item\n- 财务结算：明确回款节点，及时跟进逾期款项\n\n待验证事项：\n- 多AI交叉验证的报告产出质量是否优于单一AI\n- 酒店数据更新代运营合作模式的接受度\n- AI标书七层架构验证准确率\n- 优化后达人盘点报告的客户采纳率\n- 酒店API接口稳定性优化效果"
   }
 ];
 // ============ END OF DATA ============
 
 function init() {
   renderStats();
-  renderTimeline();
+  renderDateNav();
   renderAllComparisons();
 }
 
@@ -587,16 +619,12 @@ function renderStats() {
   document.getElementById('statSpan').textContent = `${first} ~ ${last}`;
 }
 
-function renderTimeline() {
-  const bar = document.getElementById('timelineBar');
-  let html = '<span class="label">会议时间线：</span>';
-  meetings.forEach((m, i) => {
-    const d = m.date.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' });
-    html += `<div class="timeline-dot" data-date="${d}" title="${escapeHtml(m.title)}"></div>`;
-    if (i < meetings.length - 1) {
-      html += `<span class="timeline-arrow">→</span>`;
-    }
-  });
+function renderDateNav() {
+  const bar = document.getElementById('dateNavBar');
+  let html = '<span class="label">📅 已收录 ' + meetings.length + ' 场会议 · 时间跨度：';
+  const first = meetings[0].date.toLocaleDateString('zh-CN', { month: 'long', day: 'numeric' });
+  const last = meetings[meetings.length-1].date.toLocaleDateString('zh-CN', { month: 'long', day: 'numeric' });
+  html += first + ' – ' + last + '</span>';
   bar.innerHTML = html;
 }
 
@@ -609,9 +637,10 @@ function renderAllComparisons() {
 
   const navTabs = document.getElementById('navTabs');
   navTabs.innerHTML = pairs.map((p, i) => {
-    const oldD = p.old.date.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' });
-    const newD = p.new_.date.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' });
-    return `<button class="nav-tab ${i === 0 ? 'active' : ''}" data-index="${i}" onclick="switchTab(${i})">${oldD} → ${newD}</button>`;
+    const oldD = p.old.date.toLocaleDateString('zh-CN', { month: 'long', day: 'numeric' });
+    const newD = p.new_.date.toLocaleDateString('zh-CN', { month: 'long', day: 'numeric' });
+    const isLatest = (i === 0);
+    return `<button class="nav-tab ${isLatest ? 'active' : ''}" data-index="${i}" onclick="switchTab(${i})">${oldD} → ${newD}${isLatest ? '（最新）' : ''}</button>`;
   }).join('');
 
   const content = document.getElementById('comparisonContent');
