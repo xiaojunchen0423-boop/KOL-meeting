@@ -158,7 +158,7 @@
 
   <!-- Date Navigation -->
   <div class="date-nav-bar" id="dateNavBar">
-    <span class="label">📅 已收录 16 场会议 · 时间跨度：2月27日 – 7月24日</span>
+    <span class="label" id="dateNavLabel">📅 正在加载会议数据…</span>
   </div>
 
   <!-- Comparison Section -->
@@ -793,200 +793,195 @@ const meetings = [
       {"task":"建立联盟素材常态化修复机制，避免再次批量失效","who":"相关人员","when":"持续","pri":"中"}
     ],
     "fullText": "会议主题：项目进展与相关事项讨论\n会议时间：2026年8月28日 09:54-10:14\n会议形式：KOL项目组周会（各业务线进展复盘与事项推进对齐）\n参会人员：老板、伟文、志彬\n记录人：陈晓筠\n\n核心结论：\n1. 多端功能异常已完成修复：抖音落单跳转、爱了么用户链接空白修复完成，抖音联盟转链逻辑已调整，安卓、iPhone端均可正常落单跟单\n2. 饿了么模块优化完成：无需更新客户端，仅修改服务器后台PHP文件即可完成转链逻辑调整，无额外客户端迭代成本\n3. 望远镜模块问题已处理：用户回复链接空白系联盟素材失效导致，已批量重新获取有效素材更新数据库，验证可正常使用\n4. 服务器权限已调整：原仅支持本机访问的后台页面，已新增VPN IP段访问权限，满足相关岗位定期上传订单的操作需求\n5. AI标书评审标准类模块已接近完成、当日可交付，已完成多样本验证调整，针对大文件解释超时问题已优化整体链路；制作要求类抽取逻辑基于竞品样本分析确定方向，剩余三类模块预计两周内完成，完成后上线供客户试用反馈\n6. 外料猫官方接口暂未对接：日均订单量要求不低于500单，当前未达准入门槛\n7. 梦姐反馈的周志订单未跟进问题：当日将梳理落单到跟单全流程，完成全链路测试与问题排查\n8. 中烟运维项目已收到刘工对接通知，9月将与客户线下会面\n9. 软著：梳理现有项目独立功能模块，整理材料提交给志斌\n\n重点讨论：\n- 多端功能修复：老板要求所有人工上传操作须全部由AI替代，搭建自动测试机制主动监测跳转链接可用性，无需等待用户反馈，由伟文落地执行\n- 饿了么模块：无需更新客户端，仅修改后台PHP文件即可完成转链逻辑调整；官方接口要求日均订单≥500单，当前未达准入门槛，维持现有方案，达标后再评估对接\n- 望远镜模块：用户回复链接空白系联盟素材失效导致，已批量重新获取有效素材更新数据库；素材失效类问题需建立常态化修复机制\n- 服务器权限：原仅支持本机访问的后台页面，已新增VPN IP段访问权限；VPN+IP段访问控制策略保持，确保后台访问受控\n- AI标书：评审标准类模块接近完成当日可交付，已完成多样本验证；制作要求类抽取逻辑基于竞品样本分析确定方向，剩余三类预计两周内完成；保持逐模块验证、多样本调优节奏\n- 周志订单跟进：梦姐反馈周志订单未跟进，当日将梳理落单到跟单全流程，完成全链路测试与问题排查\n- 中烟运维项目：已收到刘工对接通知，9月将与客户线下会面，先查阅项目合同、与小杰沟通熟悉业务背景；商务对接由对接人直接协调，无需联系他人\n- 软著申请准备：梳理现有项目独立功能模块，整理对应申请材料提交给志斌，随项目进度同步整理提交\n\n行动事项：\n- 所有订单上传人工操作改为AI自动完成 + 搭建自动链接监测机制（立即/高）\n- AI标书剩余三类功能模块开发，2周内完成、多样本验证后上线试用（高）\n- 周志订单落单到跟单全流程梳理与全链路测试排查（当日/高）\n- 中烟运维：9月线下会面，先查阅合同、与小杰沟通（9月/中）\n- 梳理项目独立功能模块，整理软著申请材料提交志斌（持续/中）\n- 评估饿了么官方API对接条件，达500单门槛后再评估（持续观察/低）\n- 建立联盟素材常态化修复机制（持续/中）\n\n老板思考题：\n- 所有人工操作流程全面AI化后，如何确保服务质量不下降且效率最大化？（已明确方向，待执行）\n- AI标书剩余三类模块完成后，如何从内部工具升级为对外可收费/交付的标准产品？（待产品化）\n- 饿了么官方API对接达到门槛后，自动同步相比当前人工/半自动方案的成本收益如何？（待验证门槛）\n- 中烟运维项目线下会面后，如何快速建立客户信任并推进合同落地？（待线下推进）\n- 软著申请材料随项目进度整理提交后，如何确保覆盖所有独立功能模块、满足申请要求？（持续推进）\n\n经验与启发：\n- AI全面替代人工是效率跃迁的核心方向：订单上传等所有人工操作环节都应交给AI，并搭建自动测试机制主动监测链路可用性，从「等待用户反馈」转向「主动检测」，大幅降低人工成本与漏单风险\n- 模块化迭代保障交付质量：AI标书遵循「逐模块开发—多样本验证—优化链路—交付试用」节奏，评审标准类当日可交付，剩余三类两周内完成，保持每步可验证、可回调\n- 低成本的存量优化往往比大改更划算：外料猫仅修改后台PHP文件即可完成转链逻辑调整，无需客户端迭代；但官方API对接需达订单量门槛，属阶段性决策\n- 供应链与素材的健壮性需常态化维护：望远镜联盟素材失效导致链接空白，需建立批量修复+持续监测机制；服务器VPN+IP段访问控制策略保持，确保后台安全可控\n- 项目推进讲究分工明确与资源调配灵活：中烟运维对接由对接人直接协调、无需经手他人；软著材料随项目进度梳理提交，支撑公司资质维护与开发规范"
+    }
+  ,{
+    "id": "0904",
+    "date": new Date(2026, 8, 4),
+    "title": "项目进展与工作复盘讨论 2026-09-04",
+    "conclusions": [
+      "饿了么订单自动化已完成AI智能化改造，配置Codex定时任务，每日自动上传近7日订单报表，无需人工操作，满足跟单需求",
+      "抖音穿山甲推广渠道备案已提交待审核；已切回城管网链路验证推广、跟单功能正常，完成中免日上对接",
+      "公众号新增关键词自动回复功能；修复APP羊毛优惠页因数据库权限调整导致的加载异常，当前功能已恢复正常",
+      "计划完成现有联网链路排查修复，搭建链路有效性自动化定期检查机制，及时处理链路异常",
+      "AI标书：评审标准收尾、制作类执行路径接入及多样本验证已完成，当前正在开发应标文件类功能",
+      "AI标书剩余2类应标文件预计下周全部完成后上线供客户试用，后续启动第二批标书文件制作",
+      "AI标书收费模式初步拟定按token或按份数，需在客户试用前完成与客户的沟通确认，尽快落地收费动作",
+      "中英项目已完成合同、投标文件核验，与相关负责人召开腾讯会议确认项目及系统情况，后续待对方确认对接时间",
+      "出海客户对接：已和意向内容出海客户完成面谈，对方对出海方向认可度高、沟通顺畅，当前正在推进合同细节磋商",
+      "头一档补充协议已完成条款确认，近期完成盖章并寄出；100天一级教练YBB初级门槛已审核通过",
+      "上周收入550美金，平均观看量小幅波动4%属正常范围；频道管理系统申请材料已整理，将隐藏无关菜单后提交3份文档",
+      "达人悦悦的视频版权对接仅对接单一联系人，多次沟通仅首次有回复后续无反馈，工作停滞，需主动联系正业商务侧推进",
+      "部分员工仅被动执行工作无成长规划，长期无目标将导致工作无结果，需明确各阶段学习目标",
+      "要求员工于下周提交1个月、3个月、1年的学习目标、落地路径及可量化检验标准，重点提升沟通能力",
+      "需主动探索AI落地场景，将AI应用于沟通话术撰写、合同细节梳理等环节，切实提升工作效率与沟通效果"
+    ],
+    "topics": [
+      "渠道对接及系统迭代（饿了么/抖音/城管网/中免日上）",
+      "AI标书项目推进（评审标准/制作类/应标文件/收费方案）",
+      "商务及其他项目（中英项目/出海客户/头一档/频道管理）",
+      "达人对接问题整改（达人悦悦版权）",
+      "员工成长能力建设与学习目标",
+      "AI工具应用与沟通效率提升"
+    ],
+    "actions": [
+      {"task":"AI标书剩余2类应标文件开发完成并上线试用，由负责人与客户沟通收费方案","who":"AI标书负责人","when":"下周","pri":"高"},
+      {"task":"收费模式（token或份数）在客户试用前完成沟通确认，尽快落地收费动作","who":"负责人","when":"尽快","pri":"高"},
+      {"task":"中英项目等待对方确认对接时间后推进后续工作","who":"中英项目负责人","when":"待确认","pri":"高"},
+      {"task":"出海客户合同细节持续磋商推进签署","who":"出海业务负责人","when":"持续","pri":"高"},
+      {"task":"头一档补充协议盖章寄出后确认送达情况","who":"团队","when":"近期","pri":"高"},
+      {"task":"达人悦悦版权对接主动联系正业商务侧推进","who":"团队","when":"立即","pri":"高"},
+      {"task":"员工提交1个月、3个月、1年学习目标、路径及可量化检验标准","who":"全体员工","when":"下周","pri":"高"},
+      {"task":"100天一级教练YBB后续事宜推进","who":"团队","when":"持续","pri":"中"},
+      {"task":"频道管理系统3份文档隐藏无关菜单后提交","who":"团队","when":"近期","pri":"中"},
+      {"task":"完成现有联网链路排查修复，搭建链路有效性自动化定期检查机制","who":"团队","when":"持续","pri":"中"}
+    ],
+    "fullText": "会议主题：项目进展与工作复盘讨论\n录音时间：2026-09-04 09:55 – 10:23\n参会人员：老板、各业务线负责人\n记录人：AI智能纪要\n\n核心结论：\n1. 渠道对接及系统迭代：饿了么订单已完成AI智能化改造，配置Codex定时任务，每日自动上传近7日订单报表，无需人工操作，满足跟单需求\n2. 已提交抖音穿山甲推广渠道备案待审核，切回城管网链路验证推广、跟单功能正常，完成中免日上对接\n3. 新增公众号关键词自动回复功能，修复APP羊毛优惠页因数据库权限调整导致的加载异常，当前功能已恢复正常\n4. 计划完成现有联网链路排查修复，搭建链路有效性自动化定期检查机制，及时处理链路异常\n5. AI标书：已完成评审标准收尾、制作类执行路径接入及多样本验证，当前正在开发应标文件类功能；剩余2类应标文件预计下周全部完成后上线供客户试用，后续启动第二批标书文件制作\n6. AI标书收费模式初步拟定按token或按份数两种模式，需在客户试用前完成沟通确认，尽快落地收费动作\n7. 商务及其他项目：中英项目已完成合同、投标文件核验，与相关负责人召开腾讯会议确认项目及系统情况，后续待对方确认对接时间；出海客户已面谈、认可度高，推进合同细节磋商；头一档补充协议已完成条款确认，近期盖章寄出；100天一级教练YBB初级门槛已审核通过\n8. 上周收入为550美金，平均观看量小幅波动4%属正常范围；频道管理系统申请材料已整理，将隐藏无关菜单后提交3份文档\n9. 达人悦悦视频版权对接仅对接单一联系人，多次沟通仅首次有回复后续无反馈，工作停滞，需主动联系正业商务侧推进\n10. 员工成长能力建设：部分员工仅被动执行工作无成长规划，需明确各阶段学习目标；要求员工于下周提交1个月、3个月、1年的学习目标、落地路径及可量化检验标准，重点提升沟通能力；需主动探索AI落地场景，应用于沟通话术撰写、合同细节梳理等环节\n\n重点讨论：\n- 渠道对接及系统迭代：饿了么订单报表已实现AI智能化自动上传，抖音穿山 landmarks 备案已提交待审核，城管网相关切流及中免日上对接已完成\n- AI标书项目：评审标准收尾剩两类应标文件预计下周完成，已敲定按token或份数收费并将沟通客户\n- 商务及其他项目：中英项目已对接了解情况，频道管理系统明确两个开发方向；出海客户认可度高\n- 达人悦悦问题整改：对接单一联系人无反馈、工作停滞，需主动联系正业商务侧推进，不得放任工作无进展\n- 员工成长：相关负责人提出部分员工仅被动执行、无成长规划，长期无目标将导致工作无结果，需明确各阶段学习目标\n\n关键决策：\n- AI标书剩余两类应标文件预计下周完成，上线试用后由负责人与客户沟通收费方案\n- 收费方案需提前和客户沟通，不能等上线后再谈\n- 员工需明确各阶段学习目标与路径，重点提升沟通能力\n- 达人悦悦需联系正业侧商务对接推进\n- 头一档补充协议已完成盖章，当日寄出\n\n金句时刻：\n- 如果你做一件事情系做，冇达到你嘅预期嘅，你依家话畀我听，所有嘅问题都喺对面，噉我可以话畀你听，你进步唔到㗎喇——工作未达预期时一味归咎外部是无法获得成长的核心逻辑\n- 如果我见你哋依家噉样响度噉做咧，系真系得个做㗎啫，冇结果㗎——无目标的机械工作只会徒劳无功，强调工作目标的重要性\n- 有AI喺度，你哋都冇恁明白佢到底点用呢样嘢——直指员工未充分理解AI工具价值、未合理利用工具的核心问题\n\n经验与启发：\n- 主动制定工作计划、挖掘可盈利业务方向，避免被动承接需求限制个人与业务成长\n- 业务推进须以客户付费意愿与投入产出比为优先排序准则\n- AI工具应主动探索落地场景，切实提升工作效率与沟通效果"
   }
 ];
 
-// ============ END OF DATA ============
+// ============ 渲染引擎 ============
+(function () {
+  "use strict";
 
-function init() {
-  renderStats();
-  renderDateNav();
-  renderAllComparisons();
-}
+  const fmtDate = (d) => {
+    const m = d.getMonth() + 1, day = d.getDate();
+    return `${m}月${day}日`;
+  };
 
-function renderStats() {
-  document.getElementById('statMeetings').textContent = meetings.length;
-  document.getElementById('statPairs').textContent = meetings.length - 1;
-  const first = meetings[0].date.toLocaleDateString('zh-CN', {month:'2-digit', day:'2-digit'});
-  const last = meetings[meetings.length-1].date.toLocaleDateString('zh-CN', {month:'2-digit', day:'2-digit'});
-  document.getElementById('statSpan').textContent = `${first} ~ ${last}`;
-}
+  const escapeHtml = (s) => String(s).replace(/[&<>"']/g, (c) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  }[c]));
 
-function renderDateNav() {
-  const bar = document.getElementById('dateNavBar');
-  let html = '<span class="label">📅 已收录 ' + meetings.length + ' 场会议 · 时间跨度：';
-  const first = meetings[0].date.toLocaleDateString('zh-CN', { month: 'long', day: 'numeric' });
-  const last = meetings[meetings.length-1].date.toLocaleDateString('zh-CN', { month: 'long', day: 'numeric' });
-  html += first + ' – ' + last + '</span>';
-  bar.innerHTML = html;
-}
-
-function renderAllComparisons() {
+  // 按日期升序
+  const list = meetings.slice().sort((a, b) => a.date - b.date);
   const pairs = [];
-  for (let i = meetings.length - 1; i >= 1; i--) {
-    pairs.push({ old: meetings[i - 1], new_: meetings[i], index: pairs.length });
-  }
-  pairs.reverse();
+  for (let i = 1; i < list.length; i++) pairs.push({ old: list[i - 1], now: list[i] });
+  let currentPairIdx = pairs.length - 1; // 默认最新一组
 
-  const navTabs = document.getElementById('navTabs');
-  navTabs.innerHTML = pairs.map((p, i) => {
-    const oldD = p.old.date.toLocaleDateString('zh-CN', { month: 'long', day: 'numeric' });
-    const newD = p.new_.date.toLocaleDateString('zh-CN', { month: 'long', day: 'numeric' });
-    const isLatest = (i === 0);
-    return `<button class="nav-tab ${isLatest ? 'active' : ''}" data-index="${i}" onclick="switchTab(${i})">${oldD} → ${newD}${isLatest ? '（最新）' : ''}</button>`;
-  }).join('');
+  // 统计栏
+  document.getElementById("statMeetings").textContent = list.length;
+  document.getElementById("statPairs").textContent = pairs.length;
+  document.getElementById("statSpan").textContent =
+    `${fmtDate(list[0].date)} – ${fmtDate(list[list.length - 1].date)}`;
 
-  const content = document.getElementById('comparisonContent');
-  content.innerHTML = pairs.map((p, i) => {
-    return `<div class="compare-pair" id="pair-${i}" style="${i === 0 ? '' : 'display:none;'}">
-      ${renderPairComparison(p.old, p.new_)}
-    </div>`;
-  }).join('');
-}
+  // 日期导航栏 label
+  const navLabel = document.getElementById("dateNavLabel");
+  const latest = list[list.length - 1];
+  navLabel.innerHTML =
+    `📅 已收录 <strong>${list.length}</strong> 场会议 · ` +
+    `时间跨度：${fmtDate(list[0].date)} – ${fmtDate(latest.date)} · ` +
+    `最新：<strong>${fmtDate(latest.date)}</strong>`;
 
-function renderPairComparison(oldM, newM) {
-  const oldDate = oldM.date.toLocaleDateString('zh-CN');
-  const newDate = newM.date.toLocaleDateString('zh-CN');
+  const dateNavBar = document.getElementById("dateNavBar");
 
-  const oldC = oldM.conclusions.length;
-  const newC = newM.conclusions.length;
-  const oldA = oldM.actions.length;
-  const newA = newM.actions.length;
+  function renderPanel(m, isNew) {
+    const wrap = document.createElement("div");
+    wrap.className = "compare-panel " + (isNew ? "panel-new" : "panel-old");
 
-  let html = `
-    <div class="summary-bar">
-      <div class="summary-item"><strong>${oldDate}</strong>：结论 ${oldC} 条 / 行动 ${oldA} 项</div>
-      <div class="summary-item"><strong>${newDate}</strong>：结论 ${newC} 条 / 行动 ${newA} 项</div>
-      <div class="summary-item">结论变化：<strong>${newC > oldC ? '+' : ''}${newC - oldC}</strong></div>
-      <div class="summary-item">行动事项变化：<strong>${newA > oldA ? '+' : ''}${newA - oldA}</strong></div>
-    </div>
-    <div class="compare-grid">
-      ${renderPanel(oldM, 'old', oldDate)}
-      ${renderPanel(newM, 'new', newDate)}
-    </div>
-    ${renderDiff(oldM, newM)}
-  `;
-  return html;
-}
+    const header = document.createElement("div");
+    header.className = "panel-header";
+    header.innerHTML =
+      `<span>${isNew ? "最新" : "对比基准"}</span>` +
+      `<span class="badge">${fmtDate(m.date)}</span>` +
+      `<span style="font-weight:500;font-size:13px;">${m.title}</span>`;
+    wrap.appendChild(header);
 
-function renderPanel(meeting, type, dateStr) {
-  const cls = type === 'old' ? 'panel-old' : 'panel-new';
-  let body = '';
+    const body = document.createElement("div");
+    body.className = "panel-body";
 
-  // Conclusions
-  body += `<div class="section-block"><h4>📌 核心结论 (${meeting.conclusions.length}条)</h4><ol>`;
-  body += meeting.conclusions.map(c => `<li>${escapeHtml(c)}</li>`).join('');
-  body += `</ol></div>`;
+    const sec = (title, items) => {
+      if (!items || !items.length) return "";
+      let html = `<div class="section-block"><h4>${title}</h4><ul>`;
+      items.forEach((it) => {
+        const text = typeof it === "string" ? it : it.task || "";
+        html += `<li>${text}</li>`;
+      });
+      html += "</ul></div>";
+      return html;
+    };
 
-  // Topics
-  body += `<div class="section-block"><h4>📋 讨论议题</h4><ul>`;
-  body += meeting.topics.map(t => `<li>${escapeHtml(t)}</li>`).join('');
-  body += `</ul></div>`;
+    let html = "";
+    html += sec("核心结论", m.conclusions);
+    html += sec("重点议题", m.topics);
+    if (m.actions && m.actions.length) {
+      let ahtml = `<div class="section-block"><h4>行动事项</h4><table><thead><tr><th>事项</th><th>负责人</th><th>时间</th><th>优先级</th></tr></thead><tbody>`;
+      m.actions.forEach((a) => {
+        ahtml += `<tr><td>${a.task || ""}</td><td>${a.who || ""}</td><td>${a.when || ""}</td><td>${a.pri || ""}</td></tr>`;
+      });
+      ahtml += "</tbody></table></div>";
+      html += ahtml;
+    }
+    body.innerHTML = html;
+    wrap.appendChild(body);
 
-  // Actions table
-  body += `<div class="section-block"><h4>✅ 行动事项 (${meeting.actions.length}项)</h4>`;
-  body += `<table><thead><tr><th>任务</th><th>负责人</th><th>时间</th><th>优先级</th></tr></thead><tbody>`;
-  body += meeting.actions.map(a =>
-    `<tr><td>${escapeHtml(a.task)}</td><td>${escapeHtml(a.who)}</td><td>${escapeHtml(a.when)}</td><td>${priBadge(a.pri)}</td></tr>`
-  ).join('');
-  body += `</tbody></table></div>`;
-
-  // Full text toggle
-  body += `<div class="full-content-toggle">
-    <button onclick="toggleFullContent(this)">📄 显示/隐藏完整会议内容</button>
-    <div class="full-content">${escapeHtml(meeting.fullText)}</div>
-  </div>`;
-
-  return `<div class="compare-panel ${cls}">
-    <div class="panel-header">
-      <span class="badge">${type === 'old' ? '📖 前次' : '🆕 最新'}</span>
-      ${dateStr}
-    </div>
-    <div class="panel-body">${body}</div>
-  </div>`;
-}
-
-function renderDiff(oldM, newM) {
-  const oldSet = new Set(oldM.conclusions);
-  const newSet = new Set(newM.conclusions);
-  const added = newM.conclusions.filter(c => !oldSet.has(c));
-  const removed = oldM.conclusions.filter(c => !newSet.has(c));
-
-  const oldATitles = new Set(oldM.actions.map(a => a.task));
-  const newATitles = new Set(newM.actions.map(a => a.task));
-  const addedActions = newM.actions.filter(a => !oldATitles.has(a.task));
-  const removedActions = oldM.actions.filter(a => !newATitles.has(a.task));
-
-  const oldT = new Set(oldM.topics);
-  const newT = new Set(newM.topics);
-  const addedTopics = newM.topics.filter(t => !oldT.has(t));
-  const removedTopics = oldM.topics.filter(t => !newT.has(t));
-
-  let html = `<div class="diff-section"><h3>🔄 变化对比分析</h3>`;
-
-  if (added.length > 0) {
-    html += `<div class="section-block"><h4 style="color:#16A34A;">➕ 新增结论 (${added.length}条)</h4><ul>`;
-    html += added.map(c => `<li><span class="diff-new">${escapeHtml(c)}</span></li>`).join('');
-    html += `</ul></div>`;
-  }
-  if (removed.length > 0) {
-    html += `<div class="section-block"><h4 style="color:#DC2626;">➖ 不再提及的结论 (${removed.length}条)</h4><ul>`;
-    html += removed.map(c => `<li><span class="diff-removed">${escapeHtml(c)}</span></li>`).join('');
-    html += `</ul></div>`;
-  }
-  if (addedActions.length > 0) {
-    html += `<div class="section-block"><h4 style="color:#16A34A;">➕ 新增行动事项 (${addedActions.length}项)</h4><ul>`;
-    html += addedActions.map(a => `<li><span class="diff-new">${escapeHtml(a.task)}</span> <span style="color:#6B7280;font-size:12px;">(${escapeHtml(a.who)})</span></li>`).join('');
-    html += `</ul></div>`;
-  }
-  if (removedActions.length > 0) {
-    html += `<div class="section-block"><h4 style="color:#DC2626;">➖ 已完成的/不再提及的行动事项 (${removedActions.length}项)</h4><ul>`;
-    html += removedActions.map(a => `<li><span class="diff-removed">${escapeHtml(a.task)}</span></li>`).join('');
-    html += `</ul></div>`;
-  }
-  if (addedTopics.length > 0 || removedTopics.length > 0) {
-    html += `<div class="section-block"><h4>📊 议题变化</h4>`;
-    if (addedTopics.length > 0) html += `<p style="color:#16A34A;font-size:13px;">新增议题：<span class="diff-new">${addedTopics.map(escapeHtml).join('、')}</span></p>`;
-    if (removedTopics.length > 0) html += `<p style="color:#DC2626;font-size:13px;">不再讨论：<span class="diff-removed">${removedTopics.map(escapeHtml).join('、')}</span></p>`;
-    html += `</div>`;
+    if (m.fullText) {
+      const toggle = document.createElement("div");
+      toggle.className = "full-content-toggle";
+      toggle.innerHTML =
+        `<button class="nav-tab" type="button" style="margin-top:8px;">${isNew ? "查看最新" : "查看基准"}全文 ▾</button>` +
+        `<div class="full-content">${escapeHtml(m.fullText).replace(/\n/g, "<br>")}</div>`;
+      wrap.appendChild(toggle);
+      toggle.querySelector("button").addEventListener("click", () => {
+        const fc = toggle.querySelector(".full-content");
+        fc.style.display = fc.style.display === "block" ? "none" : "block";
+      });
+    }
+    return wrap;
   }
 
-  html += `</div>`;
-  return html;
-}
+  function renderTabs() {
+    const navTabs = document.getElementById("navTabs");
+    navTabs.innerHTML = "";
+    pairs.forEach((p, idx) => {
+      const tab = document.createElement("button");
+      tab.className = "nav-tab" + (idx === currentPairIdx ? " active" : "");
+      tab.textContent = `${fmtDate(p.old.date)} → ${fmtDate(p.now.date)}`;
+      tab.addEventListener("click", () => { currentPairIdx = idx; render(); });
+      navTabs.appendChild(tab);
+    });
+  }
 
-// ============ Tab switching ============
-function switchTab(index) {
-  document.querySelectorAll('.nav-tab').forEach((t, i) => {
-    t.classList.toggle('active', i === index);
+  function render() {
+    document.querySelectorAll(".date-nav-btn").forEach((b, i) => {
+      b.classList.toggle("active", i === currentPairIdx);
+    });
+    renderTabs();
+
+    const pair = pairs[currentPairIdx];
+    const container = document.getElementById("comparisonContent");
+    container.innerHTML = "";
+
+    if (!pair) { container.innerHTML = '<div class="no-data">暂无对比数据</div>'; return; }
+
+    const summary = document.createElement("div");
+    summary.className = "summary-bar";
+    summary.innerHTML =
+      `<span class="summary-item">对比基准：<strong>${fmtDate(pair.old.date)}</strong></span>` +
+      `<span class="summary-item">最新：<strong>${fmtDate(pair.now.date)}</strong></span>` +
+      `<span class="summary-item">结论条数：<strong>${pair.now.conclusions.length}</strong></span>` +
+      `<span class="summary-item">行动事项：<strong>${pair.now.actions.length}</strong></span>`;
+    container.appendChild(summary);
+
+    const grid = document.createElement("div");
+    grid.className = "compare-grid";
+    grid.appendChild(renderPanel(pair.old, false));
+    grid.appendChild(renderPanel(pair.now, true));
+    container.appendChild(grid);
+
+    // 滚动到顶部
+    container.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  // 顶部日期导航按钮
+  pairs.forEach((p, idx) => {
+    const btn = document.createElement("button");
+    btn.className = "date-nav-btn";
+    btn.textContent = `${fmtDate(p.old.date)} → ${fmtDate(p.now.date)}`;
+    if (idx === currentPairIdx) btn.classList.add("active");
+    btn.addEventListener("click", () => { currentPairIdx = idx; render(); });
+    dateNavBar.appendChild(btn);
   });
-  document.querySelectorAll('.compare-pair').forEach((p, i) => {
-    p.style.display = i === index ? '' : 'none';
-  });
-}
 
-function toggleFullContent(btn) {
-  const box = btn.nextElementSibling;
-  box.style.display = box.style.display === 'block' ? 'none' : 'block';
-}
-
-// ============ Helpers ============
-function priBadge(pri) {
-  if (!pri) return '-';
-  const p = pri.toLowerCase();
-  if (p === '高' || p === '高优先级') return '<span style="color:#DC2626;font-weight:700;">🔴 高</span>';
-  if (p === '中' || p === '中优先级') return '<span style="color:#D97706;font-weight:700;">🟡 中</span>';
-  if (p === '低' || p === '低优先级') return '<span style="color:#6B7280;font-weight:700;">⚪ 低</span>';
-  return escapeHtml(pri);
-}
-
-function escapeHtml(str) {
-  if (!str) return '';
-  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-}
-
-// ============ Init ============
-init();
+  render();
+})();
 </script>
-</body>
-</html>
